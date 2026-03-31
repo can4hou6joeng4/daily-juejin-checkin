@@ -1,0 +1,16 @@
+{
+  "name": "daily-juejin-checkin",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Run Juejin daily sign-in and lottery tasks with Telegram notifications.",
+  "scripts": {
+    "checkin": "node ./scripts/juejin-checkin.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.54.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

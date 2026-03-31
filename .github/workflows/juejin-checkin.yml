@@ -1,0 +1,44 @@
+name: Juejin Daily Automation
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 09:05 Asia/Shanghai
+    - cron: "5 1 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: juejin-daily-checkin
+  cancel-in-progress: false
+
+jobs:
+  checkin:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Juejin daily task
+        env:
+          JUEJIN_COOKIE: ${{ secrets.JUEJIN_COOKIE }}
+          JUEJIN_USER_AGENT: ${{ vars.JUEJIN_USER_AGENT }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_MESSAGE_THREAD_ID: ${{ vars.TELEGRAM_MESSAGE_THREAD_ID }}
+          JUEJIN_HEADLESS: "false"
+        run: xvfb-run -a npm run checkin
