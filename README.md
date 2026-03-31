@@ -20,24 +20,40 @@
 - `.github/workflows/juejin-checkin.yml`
   - 每天定时执行任务，同时支持手动触发。
 
-## 使用方式
+## 环境变量
 
-1. 把当前目录作为 GitHub 仓库提交上去。
-2. 在 GitHub 仓库中进入 `Settings -> Secrets and variables -> Actions`。
-3. 新建仓库 Secret：`JUEJIN_COOKIE`
-4. 将浏览器里登录掘金后的完整 Cookie 复制进去保存。
-5. 如果要启用 Telegram 通知，再新增两个 Secret：
+实际运行时只需要下面这些变量：
+
+- 必填：`JUEJIN_COOKIE`
+- Telegram 可选：`TELEGRAM_BOT_TOKEN`、`TELEGRAM_CHAT_ID`
+- 仅在 Telegram 群组话题里发消息时可选：`TELEGRAM_MESSAGE_THREAD_ID`
+- 调试或兼容性用途可选：`JUEJIN_USER_AGENT`、`JUEJIN_HEADLESS`
+
+说明：
+
+- 如果不需要 Telegram 通知，可以完全不传任何 `TELEGRAM_*` 变量。
+- 如果要启用 Telegram 通知，`TELEGRAM_BOT_TOKEN` 和 `TELEGRAM_CHAT_ID` 必须成对提供。
+- 可选变量不需要在 `.env.local` 里预留空行或空值，不写就行。
+
+## GitHub 使用方式
+
+1. 在 GitHub 仓库中进入 `Settings -> Secrets and variables -> Actions`。
+2. 新建仓库 Secret：`JUEJIN_COOKIE`
+3. 将浏览器里登录掘金后的完整 Cookie 复制进去保存。
+4. 如果要启用 Telegram 通知，再新增两个 Secret：
    - `TELEGRAM_BOT_TOKEN`
    - `TELEGRAM_CHAT_ID`
-6. 进入 `Actions -> Juejin Daily Automation`，先手动执行一次确认配置正确。
+5. 如果你的 Telegram 群组启用了话题，可在 `Variables` 里新增 `TELEGRAM_MESSAGE_THREAD_ID`
+6. 如果你确实需要自定义浏览器标识，可在 `Variables` 里新增 `JUEJIN_USER_AGENT`
+7. 进入 `Actions -> Juejin Daily Automation`，先手动执行一次确认配置正确。
 
 ## 可选配置
 
-- `Repository variables` 中可新增 `JUEJIN_USER_AGENT`
-  - 如果你希望自定义请求头里的 `User-Agent`，可以设置它；不配也能运行。
-- `Repository variables` 中可新增 `TELEGRAM_MESSAGE_THREAD_ID`
-  - 如果你的 Telegram 群组启用了话题，可以把消息发到指定 topic。
-- `.env.local` 或本地环境变量中可选新增 `JUEJIN_HEADLESS`
+- `JUEJIN_USER_AGENT`
+  - 只有你明确需要覆盖默认浏览器标识时再设置。
+- `TELEGRAM_MESSAGE_THREAD_ID`
+  - 只有你要把消息发到 Telegram 群组 topic 时再设置。
+- `JUEJIN_HEADLESS`
   - 仅在你明确需要无头模式时设置为 `true`。默认不建议开启，因为掘金更容易识别并拦截无头浏览器。
 
 ## Telegram 配置
@@ -73,15 +89,37 @@ GitHub Actions 的 cron 使用 UTC 时区，这个表达式对应北京时间每
 
 ## 本地运行
 
-你也可以直接在项目根目录填写 `.env.local`，脚本会自动读取它：
+你可以复制 `.env.example` 或 `.env.template` 为 `.env.local`，脚本会自动读取它：
+
+```bash
+cp .env.example .env.local
+```
+
+最小可用的 `.env.local` 只需要：
 
 ```env
-JUEJIN_COOKIE=
-TELEGRAM_BOT_TOKEN=
-TELEGRAM_CHAT_ID=
+JUEJIN_COOKIE=你的完整Cookie
+```
+
+如果你也要本地测试 Telegram 通知，再额外补上：
+
+```env
+JUEJIN_COOKIE=你的完整Cookie
+TELEGRAM_BOT_TOKEN=你的BOT_TOKEN
+TELEGRAM_CHAT_ID=你的CHAT_ID
+```
+
+只有在这些场景下才需要继续加变量：
+
+```env
+# 发到 Telegram 群组 topic
 TELEGRAM_MESSAGE_THREAD_ID=
+
+# 覆盖默认浏览器标识
 JUEJIN_USER_AGENT=
-JUEJIN_HEADLESS=
+
+# 默认就是 false，不写也可以
+JUEJIN_HEADLESS=false
 ```
 
 然后执行：
@@ -96,13 +134,14 @@ npm run checkin
 xvfb-run -a npm run checkin
 ```
 
-如果你不想用文件，也可以直接通过命令行传环境变量：
+如果你不想用 `.env.local`，也可以直接通过命令行传最小变量：
 
 ```bash
-JUEJIN_COOKIE='你的完整Cookie' npm run checkin
+JUEJIN_COOKIE='你的完整Cookie' \
+npm run checkin
 ```
 
-如果要本地测试 Telegram 通知，可以额外带上：
+如果要临时测试 Telegram 通知，再追加：
 
 ```bash
 JUEJIN_COOKIE='你的完整Cookie' \
@@ -123,5 +162,6 @@ npx playwright install chromium
 - Cookie 失效后，GitHub Action 会执行失败，此时更新 `JUEJIN_COOKIE` 即可。
 - 签到接口依赖你的掘金登录态，建议直接复制浏览器请求里的完整 Cookie，避免缺字段。
 - 免费抽奖只有在当天还有免费次数时才会执行，不会消耗矿石做付费抽奖。
+- `.env.local` 可以只保留你实际需要的字段，不需要把所有可选变量都写进去。
 - Telegram 通知未配置时，脚本会跳过通知，不影响签到和抽奖主流程。
 - GitHub Actions 里任务会在 `xvfb-run` 下以有头浏览器模式运行，这是为了降低掘金风控拦截概率。
