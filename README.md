@@ -82,10 +82,10 @@ https://api.telegram.org/bot<你的BOT_TOKEN>/getUpdates
 工作流默认使用下面的 cron：
 
 ```yaml
-5 1 * * *
+14 1 * * *
 ```
 
-GitHub Actions 的 cron 使用 UTC 时区，这个表达式对应北京时间每天 `09:05`。
+GitHub Actions 的 cron 使用 UTC 时区，这个表达式对应北京时间每天 `09:14`。
 
 如果你想修改执行时间，只需要改 `.github/workflows/juejin-checkin.yml` 里的 `schedule`。
 
