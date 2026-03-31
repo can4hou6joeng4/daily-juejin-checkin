@@ -49,6 +49,14 @@ npm run checkin
 3. Update documentation whenever behavior, environment variables, or workflows change.
 4. Include validation results in your pull request description.
 
+## Pull Request Workflow
+
+1. Start new work from the latest `main`.
+2. Push your feature branch to `origin`.
+3. Open a Pull Request into `main` instead of syncing feature-branch changes directly onto `main`.
+4. Put the change summary and validation commands in the PR description.
+5. After the PR is merged, sync local `main` and delete the merged feature branch if it is no longer needed.
+
 ## Commit Message Style
 
 - Use the format `type: 中文信息`
