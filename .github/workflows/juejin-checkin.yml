@@ -3,8 +3,8 @@ name: Juejin Daily Automation
 on:
   workflow_dispatch:
   schedule:
-    # 09:05 Asia/Shanghai
-    - cron: "5 1 * * *"
+    # 09:14 Asia/Shanghai
+    - cron: "14 1 * * *"
 
 permissions:
   contents: read
