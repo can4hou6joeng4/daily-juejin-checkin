@@ -73,6 +73,7 @@ ci: 新增 GitHub Actions 定时任务
 
 ## GitHub Actions Notes
 
+- Pull requests run a lightweight CI workflow that installs dependencies, validates workflow YAML, and checks script syntax.
 - The workflow runs on `ubuntu-latest`.
 - Playwright Chromium is installed at runtime.
 - The task uses `xvfb-run` with `JUEJIN_HEADLESS=false` to reduce anti-bot blocking risk.
